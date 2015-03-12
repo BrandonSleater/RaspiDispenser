@@ -1,0 +1,57 @@
+.tool:hover .tool-item {
+	border-color: #fff;
+}
+
+.tool-content {
+	position: absolute;
+	background: #ff9681;
+	z-index: 9999;
+	width: 100px;
+	bottom: 70%;
+	margin-bottom: -1em;
+	padding: 10px;
+	border-radius: 5px;
+	font-size: 18px;
+	text-align: center;
+	color: #fff;
+	border: 1px solid #ffffff;
+	opacity: 0;
+	cursor: default;
+	pointer-events: none;
+	-webkit-font-smoothing: antialiased;
+	-webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+	transition: opacity 0.3s, transform 0.3s;
+}
+
+.tool-content:after, .tool-content:before {
+	right: 100%;
+	top: 25%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.tool-content:before {
+	border-color: rgba(194, 225, 245, 0);
+	border-right-color: #ffffff;
+	border-width: 11px;
+	margin-top: -1px;
+}
+
+.tool-right .tool-content {
+	left: 90px;
+	-webkit-transform-origin: -2em 50%;
+	transform-origin: -2em 50%;
+	-webkit-transform: translate3d(0,50%,0) rotate3d(1,1,1,30deg);
+	transform: translate3d(0,50%,0) rotate3d(1,1,1,30deg);
+}
+
+.tool:hover .tool-content {
+	opacity: 1;
+	-webkit-transform: translate3d(0,50%,0) rotate3d(0,0,0,0);
+	transform: translate3d(0,50%,0) rotate3d(0,0,0,0);
+	pointer-events: auto;
+}
