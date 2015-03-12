@@ -28,7 +28,7 @@
 				'password'  => ENV('RASPI_PASSWORD', ''),
 				'key'       => '',
 				'keyphrase' => '',
-				'root'      => '/home/bsleater',
+				'root'      => ENV('RASPI_ROOT', ''),
 			],
 		],
 		/*
