@@ -1,27 +1,24 @@
-<div class="row">
-  <div class="col-md-8">
-    @if (Session::has('success'))
-      <div class="alert-box success">
-      	<h2>{{ Session::get('success') }}</h2>
-      </div>
-    @endif
+<div class="col-md-8">
+	<div class="panel panel-default">
+		<div class="panel-heading">Music</div>
+		<div class="panel-body">
+	    @if (Session::has('success'))
+	      <div class="alert-box success">
+	      	<h2>{{ Session::get('success') }}</h2>
+	      </div>
+	    @endif
 
-	  <div class="secure">Upload form</div>
+    	<p>Current Uploaded File: {{ $sound_name }}</p>
 
-    {!! Form::open(['url' => 'file/upload', 'method'=>'POST', 'files' => true]) !!}
-	    {!! Form::token() !!}
-	  
-      {!! Form::file('image') !!}
-			
-			<p class="errors">{{$errors->first('image')}}</p>
-			
-			@if (Session::has('error'))
-				<p class="errors">{{ Session::get('error') !!}</p>
-			@endif
+	    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/upload') }}" enctype="multipart/form-data">
+				<input type="hidden" name="_token" value="{{ csrf_token() }}">
+		  
+				<p class="errors">{{ $errors->first('image') }}</p>
+		  	<div id="success"></div>
 
-	  	<div id="success"></div>
-
-	  	{!! Form::submit('Submit', ['class' => 'send-btn']) !!}
-  	{!! Form::close() !!}
+  			<input type="file" class="inline-file" name="image"></input>
+  			<button class="btn btn-primary btn-sm" type="submit">Upload</button>
+	  	</form>
+	  </div>
   </div>
 </div>

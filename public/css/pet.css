@@ -2,13 +2,17 @@ body {
 	overflow-x: hidden;
 }
 
-a, .dark {
-	color: #8f8d8e;
+a {
+	outline: 0 !important;
 }
 
 a:hover {
 	text-decoration: none !important;
 	color: #494748;	
+}
+
+a, .dark {
+	color: #8f8d8e;
 }
 
 .welcome {
@@ -79,6 +83,18 @@ fieldset[disabled] .btn-pastel.active {
 .progress-bar-pastel {
   background-color: #ff9681;
 }
+
 .progress-striped .progress-bar-pastel {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+}
+
+.login-form {
+	-webkit-box-shadow: 1px 0 5px 1px rgba(148,145,148,1);
+	-moz-box-shadow: 1px 0 5px 1px rgba(148,145,148,1);
+	box-shadow: 1px 0 5px 1px rgba(148,145,148,1);
+}
+
+.inline-file {
+	display: inline-block !important;
+	width: 40%;
 }

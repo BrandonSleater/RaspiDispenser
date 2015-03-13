@@ -1,5 +1,7 @@
 <?php namespace App\Http\Controllers;
 
+use DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
@@ -35,7 +37,7 @@ class FileController extends Controller {
 	 */
 	public function upload()
 	{
-	  $file  = ['image' => Request::file('image')];
+	  $file  = ['image' => Input::file('image')];
 	  $rules = ['image' => 'required'];
 	  $flash = [];
 
@@ -49,6 +51,8 @@ class FileController extends Controller {
 	  {
 	  	$destination = public_path().'/sounds/';
 
+	  	$this->clear($destination);
+
 	    if (Input::file('image')->isValid()) 
 	    {
 	      $extension = Input::file('image')->getClientOriginalExtension();
@@ -57,6 +61,8 @@ class FileController extends Controller {
 	      try 
 	      {
 	      	Input::file('image')->move($destination, $filename);
+
+	      	$this->log($filename);
 	      }
 	      catch (Exception $exception)
 	      {
@@ -76,6 +82,28 @@ class FileController extends Controller {
     Session::flash($flash['type'], $flash['mess']);
 
 	  return Redirect::to('home');
+	}
+
+
+	/**
+	 * Record the sound file into the system
+	 */
+	public function log($path)
+	{
+		$name = Input::file('image')->getClientOriginalName();
+
+		DB::insert('insert into file (name, path) values (?, ?)', [$name, $path]);
+	}
+
+
+	/**
+	 * Remove the old sound file
+	 */
+	public function clear($directory) 
+	{
+		if (!File::cleanDirectory($directory)) {
+			throw new Exception('Unable to clean sound directory');
+		}
 	}
 
 }

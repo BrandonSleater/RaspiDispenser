@@ -1,5 +1,7 @@
 <?php namespace App\Http\Controllers;
 
+use DB;
+
 class HomeController extends Controller {
 
 	/*
@@ -30,7 +32,27 @@ class HomeController extends Controller {
 	 */
 	public function index()
 	{
-		return view('home');
+		$sound = $this->getSoundFilename();
+
+		return view('home')->with($sound);
 	}
 
+
+	public function getSoundFilename()
+	{
+		$name = $path = '';
+
+		$results = DB::select('select name, path from file order by id desc limit 1');
+
+		if (!empty($results))
+		{
+			$name = $results[0]->name;
+			$path = $results[0]->path;
+		}
+
+		return [
+			'sound_name' => $name,
+			'sound_path' => $path
+		];
+	}
 }
