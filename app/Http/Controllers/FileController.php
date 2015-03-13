@@ -37,6 +37,10 @@ class FileController extends Controller {
 	 */
 	public function upload()
 	{
+		// Storage location of sound file
+  	$dest = public_path().'/sounds/';
+
+  	// Input
 	  $file  = ['image' => Input::file('image')];
 	  $rules = ['image' => 'required'];
 	  $flash = [];
@@ -49,20 +53,19 @@ class FileController extends Controller {
 	  } 
 	  else 
 	  {
-	  	$destination = public_path().'/sounds/';
+      $extension = Input::file('image')->getClientOriginalExtension();
 
-	  	$this->clear($destination);
-
-	    if (Input::file('image')->isValid()) 
+	    if (Input::file('image')->isValid() && $extension === 'mp3') 
 	    {
-	      $extension = Input::file('image')->getClientOriginalExtension();
-	      $filename  = Input::file('image')->getClientOriginalName();
+	      $filename = Input::file('image')->getClientOriginalName();
 
 	      try 
 	      {
-	      	Input::file('image')->move($destination, $filename);
+	  			$this->clear($dest);
+	      	
+	      	Input::file('image')->move($dest, $filename);
 
-	      	$this->log($filename);
+	      	$this->log($dest.$filename);
 	      }
 	      catch (Exception $exception)
 	      {
@@ -70,12 +73,14 @@ class FileController extends Controller {
 	      }
 
 	      $flash['type'] = 'success';
-	      $flash['mess'] = 'Upload successful';
+	      $flash['mess'] = 'Upload Successful!';
 	    }
 	    else 
 	    {
 	    	$flash['type'] = 'error';
-	      $flash['mess'] = 'Upload file is not valid';
+	      $flash['mess'] = 'Upload Failed - ';
+
+	      $flash['mess'] .= ($extension !== 'mp3') ? 'Incorrect Extension (need mp3)' : 'Invalid File';
 	    }
 	  }
 
@@ -92,6 +97,9 @@ class FileController extends Controller {
 	{
 		$name = Input::file('image')->getClientOriginalName();
 
+		// Cleanup
+		$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
+
 		DB::insert('insert into file (name, path) values (?, ?)', [$name, $path]);
 	}
 
@@ -101,7 +109,8 @@ class FileController extends Controller {
 	 */
 	public function clear($directory) 
 	{
-		if (!File::cleanDirectory($directory)) {
+		if (!File::cleanDirectory($directory)) 
+		{
 			throw new Exception('Unable to clean sound directory');
 		}
 	}
