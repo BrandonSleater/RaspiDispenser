@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use DB;
+use Auth, Datatable, DB;
 
 class HomeController extends Controller {
 
@@ -32,27 +32,37 @@ class HomeController extends Controller {
 	 */
 	public function index()
 	{
-		$sound = $this->getSoundFilename();
+		$sound = $this->getSound();
 
 		return view('home')->with($sound);
 	}
 
 
-	public function getSoundFilename()
+	public function getSound()
 	{
-		$name = $path = '';
+		$name = $path = $table = '';
 
-		$results = DB::select('select name, path from file order by id desc limit 1');
+		$results = DB::select('select name, path from file where user = ? and enable = 1', [Auth::id()]);
 
 		if (!empty($results))
 		{
-			$name = $results[0]->name;
-			$path = $results[0]->path;
+			$name  = $results[0]->name;
+			$path  = $results[0]->path;
 		}
+		
+		$table = $this->getSoundTable();
 
-		return [
-			'sound_name' => $name,
-			'sound_path' => $path
-		];
+		return ['sound_name' => $name, 'sound_path' => $path, 'sound_table' => $table];
+	}
+
+
+
+	public function getSoundTable()
+	{
+		return Datatable::table()
+	    ->addColumn('Filename', 'Enable')
+	    ->setUrl(url('file/sound'))
+	    ->setOptions(['info' => false, 'pagingType' => 'simple', 'lengthChange' => false])
+	    ->render();
 	}
 }

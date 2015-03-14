@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8541976c0cb9dc7ba05bec090dfb014b",
+    "hash": "64cdacca39793b0fdac75e4841819173",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -510,16 +510,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.0.15",
+            "version": "v5.0.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "ec3a166c504acedffd8ed878b08481f9cb1497fb"
+                "reference": "861a1e78c84dca82fe4bd85d00349c52304eea77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/ec3a166c504acedffd8ed878b08481f9cb1497fb",
-                "reference": "ec3a166c504acedffd8ed878b08481f9cb1497fb",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/861a1e78c84dca82fe4bd85d00349c52304eea77",
+                "reference": "861a1e78c84dca82fe4bd85d00349c52304eea77",
                 "shasum": ""
             },
             "require": {
@@ -632,7 +632,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2015-03-12 14:09:40"
+            "time": "2015-03-13 13:27:55"
         },
         {
             "name": "laravelcollective/remote",
@@ -2035,6 +2035,59 @@
     ],
     "packages-dev": [
         {
+            "name": "chumper/datatable",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Chumper/Datatable.git",
+                "reference": "3b251b9c6d7d266d6af37d3096034cf69c6b50a8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Chumper/Datatable/zipball/3b251b9c6d7d266d6af37d3096034cf69c6b50a8",
+                "reference": "3b251b9c6d7d266d6af37d3096034cf69c6b50a8",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "~5.0",
+                "illuminate/support": "~5.0",
+                "illuminate/view": "~5.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "dev-master",
+                "orchestra/testbench": "2.1.*",
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Chumper\\Datatable": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Plaschke",
+                    "email": "github@nilsplaschke.de",
+                    "homepage": "http://nilsplaschke.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is a laravel 4 package for the server and client side of datatablaes at http://datatables.net/",
+            "homepage": "http://github.com/Chumper/datatable",
+            "keywords": [
+                "ajax",
+                "datatables",
+                "jquery",
+                "laravel"
+            ],
+            "time": "2015-03-08 23:17:58"
+        },
+        {
             "name": "doctrine/instantiator",
             "version": "1.0.4",
             "source": {
@@ -3098,7 +3151,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "chumper/datatable": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

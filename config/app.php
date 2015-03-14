@@ -142,6 +142,7 @@ return [
 		'Barryvdh\Debugbar\ServiceProvider',
 		'Collective\Remote\RemoteServiceProvider',
 		'Illuminate\Html\HtmlServiceProvider',
+		'Chumper\Datatable\DatatableServiceProvider',
 
 		/*
 		 * Application Service Providers...
@@ -176,6 +177,7 @@ return [
 		'Config'    => 'Illuminate\Support\Facades\Config',
 		'Cookie'    => 'Illuminate\Support\Facades\Cookie',
 		'Crypt'     => 'Illuminate\Support\Facades\Crypt',
+		'Datatable' => 'Chumper\Datatable\Facades\DatatableFacade',
 		'DB'        => 'Illuminate\Support\Facades\DB',
 		'Eloquent'  => 'Illuminate\Database\Eloquent\Model',
 		'Event'     => 'Illuminate\Support\Facades\Event',

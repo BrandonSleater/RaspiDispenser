@@ -12,8 +12,12 @@
 */
 
 Route::get('/', 'AppController@index');
+
 Route::get('home', 'HomeController@index');
 
+// Sound file processing
+Route::get('file/sound', 'FileController@getTable');
+Route::get('file/edit/{id}-{enable}', 'FileController@edit');
 Route::post('file/upload', 'FileController@upload');
 
 Route::controllers([

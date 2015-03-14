@@ -1,12 +1,7 @@
 <?php namespace App\Http\Controllers;
 
-use DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
+use Auth, Datatable, DB, File, Input, Redirect, Request, Session, Validator;
+use Illuminate\Database\Eloquent\Collection;
 
 class FileController extends Controller {
 
@@ -18,7 +13,7 @@ class FileController extends Controller {
 	| This controller handles uploading sound files
 	|
 	*/
-
+ 
 	/**
 	 * Create a new controller instance.
 	 *
@@ -30,6 +25,41 @@ class FileController extends Controller {
 	}
 
 
+	public function getTable()
+	{
+		$query = DB::select('select id, name, enable from file where user = ?', [Auth::id()]);
+
+		return Datatable::collection(new Collection($query))
+			->showColumns('name')
+			->addColumn('enable', function($model) 
+			{
+				return '<a href="'.url("/file/edit/".$model->id."-".$model->enable).'">'.$model->enable.'</a>';
+			})
+      ->searchColumns('name')
+      ->orderColumns('enable', 'name')
+      ->make();
+	}
+
+
+	public function edit($id, $enable)
+	{
+		// If enabling, make sure everything else is zeroed out
+		if ($enable == 0) {
+			DB::table('file')
+				->where('user', Auth::id())
+				->where('enable', 1)
+				->update(['enable' => 0]);
+		}
+
+		// Now change the value
+		DB::table('file')
+			->where('id', $id)
+			->update(['enable' => !$enable]);
+
+	  return Redirect::to('home');
+	}
+
+
 	/**
 	 * Upload a sound file.
 	 *
@@ -37,13 +67,13 @@ class FileController extends Controller {
 	 */
 	public function upload()
 	{
-		// Storage location of sound file
-  	$dest = public_path().'/sounds/';
+  	// Setup
+		$dest = public_path().'/sounds/'.Auth::id().'/';
+	  $sess = [];
 
-  	// Input
+	  // input
 	  $file  = ['image' => Input::file('image')];
 	  $rules = ['image' => 'required'];
-	  $flash = [];
 
 	  $validator = Validator::make($file, $rules);
 	  
@@ -55,14 +85,14 @@ class FileController extends Controller {
 	  {
       $extension = Input::file('image')->getClientOriginalExtension();
 
-	    if (Input::file('image')->isValid() && $extension === 'mp3') 
+      // Ensure its a sound file
+	    if (Input::file('image')->isValid() && $extension === 'mp3')
 	    {
 	      $filename = Input::file('image')->getClientOriginalName();
 
+	      // Setup the file
 	      try 
-	      {
-	  			$this->clear($dest);
-	      	
+	      {	      	
 	      	Input::file('image')->move($dest, $filename);
 
 	      	$this->log($dest.$filename);
@@ -72,19 +102,19 @@ class FileController extends Controller {
 	      	Log::error($exception);
 	      }
 
-	      $flash['type'] = 'success';
-	      $flash['mess'] = 'Upload Successful!';
+	      $sess['type'] = 'success';
+	      $sess['mess'] = 'Upload Successful!';
 	    }
 	    else 
 	    {
-	    	$flash['type'] = 'error';
-	      $flash['mess'] = 'Upload Failed - ';
+	    	$sess['type'] = 'error';
+	      $sess['mess'] = 'Upload Failed - ';
 
-	      $flash['mess'] .= ($extension !== 'mp3') ? 'Incorrect Extension (need mp3)' : 'Invalid File';
+	      $sess['mess'] .= ($extension !== 'mp3') ? 'Incorrect Extension (need mp3)' : 'Invalid File';
 	    }
 	  }
 
-    Session::flash($flash['type'], $flash['mess']);
+    Session::flash($sess['type'], $sess['mess']);
 
 	  return Redirect::to('home');
 	}
@@ -97,22 +127,22 @@ class FileController extends Controller {
 	{
 		$name = Input::file('image')->getClientOriginalName();
 
-		// Cleanup
+		// Disable the old record
+		DB::update('update file set enable = ? where user = ? and enable = 1', [0, Auth::id()]);
+
+		// We want relative
 		$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
 
-		DB::insert('insert into file (name, path) values (?, ?)', [$name, $path]);
-	}
-
-
-	/**
-	 * Remove the old sound file
-	 */
-	public function clear($directory) 
-	{
-		if (!File::cleanDirectory($directory)) 
-		{
-			throw new Exception('Unable to clean sound directory');
-		}
+		// Create the record
+		DB::insert('
+			insert into file 
+				(name, user, path, created_at) 
+			values 
+				(?, ?, ?, NOW())
+			on duplicate key update
+				path = ?,
+				enable = 1, 
+				updated_at = NOW()', [$name, Auth::id(), $path, $path]);
 	}
 
 }
