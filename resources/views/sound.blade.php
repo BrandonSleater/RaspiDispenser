@@ -12,32 +12,25 @@
 				</div>
 			@endif
 	
-			<div class="row">		
-				<div class="col-md-5 uploader">
-			    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/upload') }}" enctype="multipart/form-data">
-						<input type="hidden" name="_token" value="{{ csrf_token() }}">
-		  			
-		  			<button class="btn btn-primary btn-sm btn-upload" type="submit">Upload File</button>
-		  			<input type="file" class="inline-file" name="image"></input>
-			  	</form>
-			  </div>
+			<p>Add File</p>
+	    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/upload') }}" enctype="multipart/form-data">
+				<input type="hidden" name="_token" value="{{ csrf_token() }}">
+  			
+  			<button class="btn btn-primary btn-sm btn-upload" type="submit">Upload File</button>
+  			<input type="file" class="inline-file" name="image"></input>
+	  	</form>
 
-				<div class="col-md-5">
-					@if (!empty($sound_path))
-			    	<!-- <hr> -->
-						<p>Current File: <b>{{ $sound_name }}</b></p>
-			    	<audio controls>
-			    		<source src="{{ $sound_path }}" type="audio/mpeg">
-			    	</audio>
-			    @endif	  
-			  </div>
-			</div>
+			@if (!empty($sound_path))
+	    	<hr>
+				<p>Enabled File: <b>{{ $sound_name }}</b></p>
+	    	<audio controls>
+	    		<source src="{{ $sound_path }}" type="audio/mpeg">
+	    	</audio>
+	    @endif	  
 
 			<hr>
-			<p>Uploaded Files</p>
-			@if (isset($sound_table))
-				{!! $sound_table !!}
-	  	@endif
+			<p>My Files</p>
+			{!! $sound_table !!}
 	  </div>
   </div>
 </div>
