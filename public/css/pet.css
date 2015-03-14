@@ -15,14 +15,6 @@ a, .dark {
 	color: #8f8d8e;
 }
 
-.welcome {
-	font-size: 80px;
-}
-
-.home {
-	margin-top: 40px;
-}
-
 .btn-pastel {
   color: #ffffff;
   background-color: #ff9681;
@@ -73,6 +65,21 @@ fieldset[disabled] .btn-pastel.active {
   background-color: #ffffff;
 }
 
+.btn-upload {
+	padding: 0 9px;
+	font-size: 13px;
+	height: 23px;
+}
+
+.home {
+	margin-top: 40px;
+}
+
+.inline-file {
+	display: inline-block !important;
+	width: 237px;
+}
+
 .pills-pastel > li.active > a,
 .pills-pastel > li.active > a:hover,
 .pills-pastel > li.active > a:focus {
@@ -94,7 +101,20 @@ fieldset[disabled] .btn-pastel.active {
 	box-shadow: 1px 0 5px 1px #d5d5d5;
 }
 
-.inline-file {
-	display: inline-block !important;
-	width: 237px;
+.uploader {
+	margin-top: 25px;
+}
+
+.vertical {
+ 	width: 2px;
+ 	height: 150px;
+ 	background-color: #000000;
+ 	position: absolute;
+ 	top: 0px;
+ 	left: 50px;
+ 	z-index: 10;
+}
+
+.welcome {
+	font-size: 80px;
 }

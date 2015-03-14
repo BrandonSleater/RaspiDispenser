@@ -2,8 +2,6 @@
 
 @section('content')
 	<div class="row home">
-		@include('schedule')
-		@include('amount')
-		@include('supply')
+		@include('sound');
 	</div>
 @endsection

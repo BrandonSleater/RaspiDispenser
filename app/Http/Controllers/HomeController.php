@@ -1,7 +1,5 @@
 <?php namespace App\Http\Controllers;
 
-use Auth, Datatable, DB;
-
 class HomeController extends Controller {
 
 	/*
@@ -15,7 +13,7 @@ class HomeController extends Controller {
 	|
 	*/
 
-	/**
+	/*
 	 * Create a new controller instance.
 	 *
 	 * @return void
@@ -25,44 +23,13 @@ class HomeController extends Controller {
 		$this->middleware('auth');
 	}
 
-	/**
+	/*
 	 * Show the application dashboard to the user.
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function home()
 	{
-		$sound = $this->getSound();
-
-		return view('home')->with($sound);
-	}
-
-
-	public function getSound()
-	{
-		$name = $path = $table = '';
-
-		$results = DB::select('select name, path from file where user = ? and enable = 1', [Auth::id()]);
-
-		if (!empty($results))
-		{
-			$name  = $results[0]->name;
-			$path  = $results[0]->path;
-		}
-		
-		$table = $this->getSoundTable();
-
-		return ['sound_name' => $name, 'sound_path' => $path, 'sound_table' => $table];
-	}
-
-
-
-	public function getSoundTable()
-	{
-		return Datatable::table()
-	    ->addColumn('Filename', 'Enable')
-	    ->setUrl(url('file/sound'))
-	    ->setOptions(['info' => false, 'pagingType' => 'simple', 'lengthChange' => false])
-	    ->render();
+		return view('home');
 	}
 }

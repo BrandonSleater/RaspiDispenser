@@ -27,7 +27,7 @@ class AppController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function home()
 	{
 		return view('auth.login');
 	}

@@ -1,6 +1,6 @@
-<div class="col-md-6">
+<div class="col-md-12">
 	<div class="panel panel-default panel-form">
-		<div class="panel-heading">Dispensing Sound</div>
+		<div class="panel-heading">Dispense Track</div>
 		<div class="panel-body">
 			@if (session('success'))
 				<div class="alert alert-success">
@@ -11,25 +11,33 @@
 					{{ session('error') }}
 				</div>
 			@endif
-			
-	    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/upload') }}" enctype="multipart/form-data">
-				<input type="hidden" name="_token" value="{{ csrf_token() }}">
-  			<input type="file" class="inline-file" name="image"></input>
+	
+			<div class="row">		
+				<div class="col-md-5 uploader">
+			    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/upload') }}" enctype="multipart/form-data">
+						<input type="hidden" name="_token" value="{{ csrf_token() }}">
+		  			
+		  			<button class="btn btn-primary btn-sm btn-upload" type="submit">Upload File</button>
+		  			<input type="file" class="inline-file" name="image"></input>
+			  	</form>
+			  </div>
 
-  			<button class="btn btn-primary btn-sm" type="submit">Upload File</button>
-	  	</form>
+				<div class="col-md-5">
+					@if (!empty($sound_path))
+			    	<!-- <hr> -->
+						<p>Current File: <b>{{ $sound_name }}</b></p>
+			    	<audio controls>
+			    		<source src="{{ $sound_path }}" type="audio/mpeg">
+			    	</audio>
+			    @endif	  
+			  </div>
+			</div>
 
-			@if (!empty($sound_path))
-	    	<hr>
-				<p>Current File: <b>{{ $sound_name }}</b></p>
-	    	<audio controls>
-	    		<source src="{{ $sound_path }}" type="audio/mpeg">
-	    	</audio>
-	    @endif	  
-	    	
 			<hr>
 			<p>Uploaded Files</p>
-			{!! $sound_table !!}
+			@if (isset($sound_table))
+				{!! $sound_table !!}
+	  	@endif
 	  </div>
   </div>
 </div>

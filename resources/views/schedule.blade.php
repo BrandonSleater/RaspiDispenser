@@ -1,5 +1,9 @@
-<div class="col-md-8">
-	<div class="progress progress-striped active">
-		<div class="progress-bar progress-bar-pastel" role="progressbar" data-transitiongoal="40"></div>
+<div class="col-md-6">
+	<div class="panel panel-default panel-form">
+		<div class="panel-heading">Dispense Schedule</div>
+		<div class="panel-body">
+			<div class="progress progress-striped active">
+			<div class="progress-bar progress-bar-pastel" role="progressbar" data-transitiongoal="40"></div>
+		</div>
 	</div>
 </div>

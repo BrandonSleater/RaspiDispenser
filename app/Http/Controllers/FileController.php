@@ -56,7 +56,7 @@ class FileController extends Controller {
 			->where('id', $id)
 			->update(['enable' => !$enable]);
 
-	  return Redirect::to('home');
+	  return Redirect::to('settings');
 	}
 
 
@@ -79,7 +79,7 @@ class FileController extends Controller {
 	  
 	  if ($validator->fails())
 	  {
-	    return Redirect::to('home')->withInput()->withErrors($validator);
+	    return Redirect::to('settings')->withInput()->withErrors($validator);
 	  } 
 	  else 
 	  {
@@ -116,7 +116,7 @@ class FileController extends Controller {
 
     Session::flash($sess['type'], $sess['mess']);
 
-	  return Redirect::to('home');
+	  return Redirect::to('settings');
 	}
 
 

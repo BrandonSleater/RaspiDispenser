@@ -1,11 +1,12 @@
 .tool:hover .tool-item {
+	z-index: 9999 !important;
 	border-color: #fff;
 }
 
 .tool-content {
 	position: absolute;
 	background: #ff9681;
-	z-index: 9999;
+	z-index: 9999 !important;
 	width: 100px;
 	bottom: 70%;
 	margin-bottom: -1em;
@@ -27,6 +28,7 @@
 	right: 100%;
 	top: 25%;
 	border: solid transparent;
+	z-index: 9999 !important;
 	content: " ";
 	height: 0;
 	width: 0;
@@ -37,12 +39,14 @@
 .tool-content:before {
 	border-color: rgba(194, 225, 245, 0);
 	border-right-color: #ffffff;
+	z-index: 9999 !important;
 	border-width: 11px;
 	margin-top: -1px;
 }
 
 .tool-right .tool-content {
 	left: 90px;
+	z-index: 9999 !important;
 	-webkit-transform-origin: -2em 50%;
 	transform-origin: -2em 50%;
 	-webkit-transform: translate3d(0,50%,0) rotate3d(1,1,1,30deg);
@@ -50,6 +54,7 @@
 }
 
 .tool:hover .tool-content {
+	z-index: 9999 !important;
 	opacity: 1;
 	-webkit-transform: translate3d(0,50%,0) rotate3d(0,0,0,0);
 	transform: translate3d(0,50%,0) rotate3d(0,0,0,0);

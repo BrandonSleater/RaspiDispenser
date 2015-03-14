@@ -11,14 +11,16 @@
 |
 */
 
-Route::get('/', 'AppController@index');
+Route::get('/', 'AppController@home');
 
-Route::get('home', 'HomeController@index');
+Route::get('home', 'HomeController@home');
 
 // Sound file processing
 Route::get('file/sound', 'FileController@getTable');
 Route::get('file/edit/{id}-{enable}', 'FileController@edit');
 Route::post('file/upload', 'FileController@upload');
+
+Route::get('settings', 'SettingsController@home');
 
 Route::controllers([
 	'auth'     => 'Auth\AuthController',
