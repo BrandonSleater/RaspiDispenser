@@ -16,7 +16,7 @@
 	    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/add') }}" enctype="multipart/form-data">
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
   			
-  			<button class="btn btn-primary btn-sm btn-upload" type="submit">Upload File</button>
+  			<button class="btn btn-pastel btn-sm btn-upload" type="submit">Upload File</button>
   			<input type="file" class="inline-file" name="image"></input>
 	  	</form>
 

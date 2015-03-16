@@ -75,6 +75,11 @@ fieldset[disabled] .btn-pastel.active {
 	padding: 0 9px;
 	font-size: 13px;
 	height: 23px;
+	margin-top: -2px;
+}
+
+.dataTables_empty {
+	text-align: center;
 }
 
 .home {
