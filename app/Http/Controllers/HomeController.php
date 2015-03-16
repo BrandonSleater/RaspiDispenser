@@ -4,6 +4,8 @@ use Datatable, SSH;
 
 class HomeController extends Controller {
 
+	private $output;
+
 	/*
 	|--------------------------------------------------------------------------
 	| Home Controller
@@ -62,13 +64,19 @@ class HomeController extends Controller {
 	protected function getConnectionStatus()
 	{
 		$command = ['ls'];
-		$output  = '';
 
-		// SSH::run($command, function($line) {
-		// 	$output .= $line.PHP_EOL;
-		// });
+		try
+		{
+			SSH::run($command, function($line) {
+				$this->output = $line.PHP_EOL;
+			});
+		}
+		catch (\ErrorException $e)
+		{
+			// Intentionally left blank
+		}
 
-		return ['output' => $output];
+		return ['output' => $this->output];
 	}
 
 }
