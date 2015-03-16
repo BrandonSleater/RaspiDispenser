@@ -54,6 +54,11 @@ class HomeController extends Controller {
 		return ['table' => $table];
 	}
 
+	/**
+	 * Make contact with the raspberry pi.
+	 *
+	 * @param array
+	 */
 	protected function getConnectionStatus()
 	{
 		$command = ['ls'];

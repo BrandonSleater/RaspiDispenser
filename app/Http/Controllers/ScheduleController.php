@@ -79,7 +79,7 @@ class ScheduleController extends Controller {
 				return '<a href="'.url("/schedule/delete&ID=".$model->id).'"><i class="fa fa-times"></i></a>';
 			})
       ->searchColumns('event', 'time', 'amount', 'enable')
-      ->orderColumns('time')
+      ->orderColumns('event', 'time', 'amount', 'enable')
       ->make();
 	}
 

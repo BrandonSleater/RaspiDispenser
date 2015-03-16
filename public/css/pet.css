@@ -113,6 +113,16 @@ fieldset[disabled] .btn-pastel.active {
 	width: 160px !important;
 }
 
+table.dataTable {
+	border-bottom-color: #eee !important;
+}
+
+table.dataTable thead .sorting, 
+table.dataTable thead .sorting_asc, 
+table.dataTable thead .sorting_desc {
+  background : none;
+}
+
 .time-label {
 	padding-right: 5px;
 }
