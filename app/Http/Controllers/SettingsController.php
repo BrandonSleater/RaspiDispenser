@@ -6,15 +6,14 @@ class SettingsController extends Controller {
 
 	/*
 	|--------------------------------------------------------------------------
-	| Startup Controller
+	| Settings Controller
 	|--------------------------------------------------------------------------
 	|
-	| This controller renders the "start page" for the application and
-	| is configured to only allow guests
+	| This controller handles application settings.
 	|
 	*/
 
-	/*
+	/**
 	 * Create a new controller instance.
 	 *
 	 * @return void
@@ -24,25 +23,28 @@ class SettingsController extends Controller {
 		$this->middleware('auth');
 	}
 
-	/*
-	 * Show the application start screen to the user.
+	/**
+	 * Show the settings page.
 	 *
 	 * @return Response
 	 */
-	public function home()
+	public function page()
 	{
-		$sound = $this->getSound();
+		$sound = $this->details();
 
 		return view('settings')->with($sound);
 	}
 
-	/*
+	/**
+	 * Get details on the enabled sound file.
 	 *
+	 * @return array
 	 */
-	public function getSound()
+	public function details()
 	{
-		$name = $path = $table = '';
+		$name = $path = '';
 
+		// Determine if we have a set file
 		$results = DB::select('select name, path from file where user = ? and enable = 1', [Auth::id()]);
 
 		if (!empty($results))
@@ -51,19 +53,21 @@ class SettingsController extends Controller {
 			$path  = $results[0]->path;
 		}
 		
-		$table = $this->getSoundTable();
+		$table = $this->getFileTable();
 
 		return ['sound_name' => $name, 'sound_path' => $path, 'sound_table' => $table];
 	}
 
-	/*
+	/**
+	 * Build the html datatable.
 	 *
+	 * @return Chumper\Datatable\Datatable
 	 */
-	public function getSoundTable()
+	public function getFileTable()
 	{
 		return Datatable::table()
 	    ->addColumn('Filename', 'Enable')
-	    ->setUrl(url('file/sound'))
+	    ->setUrl(url('file/table'))
 	    ->setOptions(['info' => false, 'pagingType' => 'simple', 'lengthChange' => false])
 	    ->render();
 	}

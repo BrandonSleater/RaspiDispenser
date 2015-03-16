@@ -11,16 +11,25 @@
 |
 */
 
-Route::get('/', 'AppController@home');
+/* Root */
+Route::get('/', 'AppController@page');
 
-Route::get('home', 'HomeController@home');
+/* Home */
+Route::get('home', 'HomeController@page');
 
-// Sound file processing
-Route::get('file/sound', 'FileController@getTable');
-Route::get('file/edit/{id}-{enable}', 'FileController@edit');
-Route::post('file/upload', 'FileController@upload');
+/* Home - Schedule */
+Route::post('schedule/add', 'ScheduleController@add');
+Route::post('schedule/update', 'ScheduleController@update');
+Route::get('schedule/edit&ID={id}', 'ScheduleController@edit');
+Route::get('schedule/table', 'ScheduleController@getTable');
 
-Route::get('settings', 'SettingsController@home');
+/* Settings */
+Route::get('settings', 'SettingsController@page');
+
+/* Settings - File */
+Route::post('file/add', 'FileController@add');
+Route::get('file/edit&ID={id}&EN={enable}', 'FileController@edit');
+Route::get('file/table', 'FileController@getTable');
 
 Route::controllers([
 	'auth'     => 'Auth\AuthController',

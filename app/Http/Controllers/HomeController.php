@@ -1,5 +1,7 @@
 <?php namespace App\Http\Controllers;
 
+use Datatable;
+
 class HomeController extends Controller {
 
 	/*
@@ -7,9 +9,7 @@ class HomeController extends Controller {
 	| Home Controller
 	|--------------------------------------------------------------------------
 	|
-	| This controller renders your application's "dashboard" for users that
-	| are authenticated. Of course, you are free to change or remove the
-	| controller as you wish. It is just here to get your app started!
+	| This controller renders the application's dashboard.
 	|
 	*/
 
@@ -28,8 +28,27 @@ class HomeController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function home()
+	public function page()
 	{
-		return view('home');
+		$table = $this->getScheduleTable();
+
+		return view('home')->with($table);
 	}
+
+	/**
+	 * Build the schedule html datatable.
+	 *
+	 * @return Chumper\Datatable\Datatable
+	 */
+	public function getScheduleTable()
+	{
+		$table = Datatable::table()
+	    ->addColumn('Event', 'Time', 'Enable')
+	    ->setUrl(url('schedule/table'))
+	    ->setOptions(['info' => false, 'pagingType' => 'simple', 'lengthChange' => false])
+	    ->render();
+
+		return ['schedule_table' => $table];
+	}
+
 }

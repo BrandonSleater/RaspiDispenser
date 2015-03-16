@@ -4,11 +4,10 @@ class AppController extends Controller {
 
 	/*
 	|--------------------------------------------------------------------------
-	| Startup Controller
+	| Root Controller
 	|--------------------------------------------------------------------------
 	|
-	| This controller renders the "start page" for the application and
-	| is configured to only allow guests
+	| This controller renders the login page for the application.
 	|
 	*/
 
@@ -27,7 +26,7 @@ class AppController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function home()
+	public function page()
 	{
 		return view('auth.login');
 	}

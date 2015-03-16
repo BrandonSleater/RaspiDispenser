@@ -10,7 +10,7 @@ class FileController extends Controller {
 	| File Controller
 	|--------------------------------------------------------------------------
 	|
-	| This controller handles uploading sound files
+	| This controller handles uploading sound files.
 	|
 	*/
  
@@ -24,23 +24,44 @@ class FileController extends Controller {
 		$this->middleware('auth');
 	}
 
-
-	public function getTable()
+	/**
+	 * Process adding a sound file.
+	 *
+	 * @return Redirect
+	 */
+	public function add()
 	{
-		$query = DB::select('select id, name, enable from file where user = ?', [Auth::id()]);
+  	// Setup
+		$destination = public_path().'/sounds/'.Auth::id().'/';
+	  $message = [];
 
-		return Datatable::collection(new Collection($query))
-			->showColumns('name')
-			->addColumn('enable', function($model) 
-			{
-				return '<a href="'.url("/file/edit/".$model->id."-".$model->enable).'">'.$model->enable.'</a>';
-			})
-      ->searchColumns('name')
-      ->orderColumns('enable', 'name')
-      ->make();
+	  // Input
+	  $file  = ['image' => Input::file('image')];
+	  $rules = ['image' => 'required'];
+
+	  $validator = Validator::make($file, $rules);
+	  
+	  if ($validator->fails())
+	  {
+	    return Redirect::to('settings')->withInput()->withErrors($validator);
+	  } 
+	  else 
+	  {
+	  	$message = $this->upload($destination);
+	  }
+
+    Session::flash($message['type'], $message['content']);
+
+	  return Redirect::to('settings');
 	}
 
-
+	/**
+	 * Edit a sound file.
+	 *
+	 * @param  int  $id
+	 * @param  int  $enable
+	 * @return Redirect
+	 */
 	public function edit($id, $enable)
 	{
 		// If enabling, make sure everything else is zeroed out
@@ -59,71 +80,33 @@ class FileController extends Controller {
 	  return Redirect::to('settings');
 	}
 
-
 	/**
-	 * Upload a sound file.
+	 * Build the datatable of uploaded sound files.
 	 *
-	 * @return Redirect
+	 * @return \Illuminate\Support\Collection
 	 */
-	public function upload()
+	public function getTable()
 	{
-  	// Setup
-		$dest = public_path().'/sounds/'.Auth::id().'/';
-	  $sess = [];
+		$results = DB::select('select id, name, enable from file where user = ?', [Auth::id()]);
 
-	  // input
-	  $file  = ['image' => Input::file('image')];
-	  $rules = ['image' => 'required'];
-
-	  $validator = Validator::make($file, $rules);
-	  
-	  if ($validator->fails())
-	  {
-	    return Redirect::to('settings')->withInput()->withErrors($validator);
-	  } 
-	  else 
-	  {
-      $extension = Input::file('image')->getClientOriginalExtension();
-
-      // Ensure its a sound file
-	    if (Input::file('image')->isValid() && $extension === 'mp3')
-	    {
-	      $filename = Input::file('image')->getClientOriginalName();
-
-	      // Setup the file
-	      try 
-	      {	      	
-	      	Input::file('image')->move($dest, $filename);
-
-	      	$this->log($dest.$filename);
-	      }
-	      catch (Exception $exception)
-	      {
-	      	Log::error($exception);
-	      }
-
-	      $sess['type'] = 'success';
-	      $sess['mess'] = 'Upload Successful!';
-	    }
-	    else 
-	    {
-	    	$sess['type'] = 'error';
-	      $sess['mess'] = 'Upload Failed - ';
-
-	      $sess['mess'] .= ($extension !== 'mp3') ? 'Incorrect Extension (need mp3)' : 'Invalid File';
-	    }
-	  }
-
-    Session::flash($sess['type'], $sess['mess']);
-
-	  return Redirect::to('settings');
+		return Datatable::collection(new Collection($results))
+			->showColumns('name')
+			->addColumn('enable', function($model) 
+			{
+				return '<a href="'.url("/file/edit&ID=".$model->id."&EN=".$model->enable).'">'.$model->enable.'</a>';
+			})
+      ->searchColumns('name')
+      ->orderColumns('enable', 'name')
+      ->make();
 	}
 
-
 	/**
-	 * Record the sound file into the system
+	 * Insert the sound file into to the file table.
+	 *
+	 * @param  string $path
+	 * @return void
 	 */
-	public function log($path)
+	public function record($path)
 	{
 		$name = Input::file('image')->getClientOriginalName();
 
@@ -143,6 +126,52 @@ class FileController extends Controller {
 				path = ?,
 				enable = 1, 
 				updated_at = NOW()', [$name, Auth::id(), $path, $path]);
+	}
+
+	/**
+	 * Upload a sound file into storage.
+	 *
+	 * @param  string $destination
+	 * @return array
+	 */
+	private function upload($destination)
+	{
+    $extension = Input::file('image')->getClientOriginalExtension();
+
+    // Message details
+    $content = $type = '';
+
+    // Ensure its a sound file
+    if (Input::file('image')->isValid() && $extension === 'mp3')
+    {
+      $filename = Input::file('image')->getClientOriginalName();
+
+      // Insert file
+      try 
+      {
+      	$path = $destination.$filename;
+
+      	Input::file('image')->move($destination, $filename);
+
+      	$this->record($path);
+      }
+      catch (Exception $exception)
+      {
+      	Log::error($exception);
+      }
+
+      $type = 'success';
+      $content = 'Upload Successful!';
+    }
+    else 
+    {
+      $desc = ($extension !== 'mp3') ? 'Incorrect Extension (need mp3)' : 'Invalid File';
+
+    	$type = 'error';
+      $content = 'Upload Failed - '.$desc;
+    }
+
+    return ['content' => $content, 'type' => $type];
 	}
 
 }

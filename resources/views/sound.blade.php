@@ -13,7 +13,7 @@
 			@endif
 	
 			<p>Add File</p>
-	    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/upload') }}" enctype="multipart/form-data">
+	    <form class="form-horizontal" role="form" method="POST" action="{{ url('/file/add') }}" enctype="multipart/form-data">
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
   			
   			<button class="btn btn-primary btn-sm btn-upload" type="submit">Upload File</button>
