@@ -80,6 +80,10 @@ class FileController extends Controller {
 			{
 				return '<a href="'.url("/file/edit&ID=".$model->id."&EN=".$model->enable).'">'.$model->enable.'</a>';
 			})
+			->addColumn('remove', function($model) 
+			{
+				return '<a href="'.url("/file/delete&ID=".$model->id).'"><i class="fa fa-times"></i></a>';
+			})
       ->searchColumns('name')
       ->orderColumns('enable', 'name')
       ->make();
@@ -184,6 +188,24 @@ class FileController extends Controller {
 				updated_at = NOW()';
 
 		DB::insert($sql, [$filename, Auth::id(), $path, $path]);
+	}
+
+	/**
+	 * Delete a sound file.
+	 *
+	 * @param  int $id
+	 * @return Redirect
+	 */
+	public function delete($id)
+	{
+		// Delete file
+		$filename = DB::table('file')->where('id', $id)->pluck('name');
+		File::delete($this->destination.$filename);
+		
+		// Delete entry
+		DB::table('file')->where('id', $id)->delete();
+
+		return Redirect::to('settings');
 	}
 
 }

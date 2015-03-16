@@ -46,7 +46,7 @@ class HomeController extends Controller {
 	protected function getScheduleTable()
 	{
 		$table = Datatable::table()
-	    ->addColumn('Event', 'Time', 'Amount', 'Enable')
+	    ->addColumn('Event', 'Time', 'Amount', 'Enable', 'Remove')
 	    ->setUrl(url('schedule/table'))
 	    ->setOptions(['info' => false, 'pagingType' => 'simple', 'lengthChange' => false])
 	    ->render();

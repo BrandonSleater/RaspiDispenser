@@ -74,6 +74,10 @@ class ScheduleController extends Controller {
 				return '<a href="'.url("/schedule/edit&ID=".$model->id).'">'.$model->event.'</a>';
 			})
 			->showColumns('time', 'amount', 'enable')
+			->addColumn('remove', function($model) 
+			{
+				return '<a href="'.url("/schedule/delete&ID=".$model->id).'"><i class="fa fa-times"></i></a>';
+			})
       ->searchColumns('event', 'time', 'amount', 'enable')
       ->orderColumns('time')
       ->make();
@@ -197,6 +201,19 @@ class ScheduleController extends Controller {
 			Session::flash('time_error', 'Time Already Exists');
 		  return Redirect::to('home');
 		}
+	}
+
+	/**
+	 * Delete a scheduled time.
+	 *
+	 * @param  int $id
+	 * @return Redirect
+	 */
+	public function delete($id)
+	{
+		DB::table('schedule')->where('id', $id)->delete();
+
+		return Redirect::to('home');
 	}
 
 }

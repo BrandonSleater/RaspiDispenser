@@ -20,6 +20,7 @@ Route::get('home', 'HomeController@page');
 /* Home - Schedule */
 Route::post('schedule/add', 'ScheduleController@add');
 Route::post('schedule/update', 'ScheduleController@update');
+Route::get('schedule/delete&ID={id}', 'ScheduleController@delete');
 Route::get('schedule/edit&ID={id}', 'ScheduleController@edit');
 Route::get('schedule/table', 'ScheduleController@table');
 
@@ -28,6 +29,7 @@ Route::get('settings', 'SettingsController@page');
 
 /* Settings - File */
 Route::post('file/add', 'FileController@add');
+Route::get('file/delete&ID={id}', 'FileController@delete');
 Route::get('file/edit&ID={id}&EN={enable}', 'FileController@edit');
 Route::get('file/table', 'FileController@table');
 

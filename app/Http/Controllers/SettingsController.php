@@ -47,10 +47,10 @@ class SettingsController extends Controller {
 		// Determine if we have a set file
 		$results = DB::select('select name, path from file where user = ? and enable = 1', [Auth::id()]);
 
-		if (!empty($results))
+		if (array_key_exists(0, $results))
 		{
-			$name  = $results[0]->name;
-			$path  = $results[0]->path;
+			$name = $results[0]->name;
+			$path = $results[0]->path;
 		}
 		
 		$table = $this->getFileTable();
@@ -66,7 +66,7 @@ class SettingsController extends Controller {
 	public function getFileTable()
 	{
 		return Datatable::table()
-	    ->addColumn('Filename', 'Enable')
+	    ->addColumn('Filename', 'Enable', 'Remove')
 	    ->setUrl(url('file/table'))
 	    ->setOptions(['info' => false, 'pagingType' => 'simple', 'lengthChange' => false])
 	    ->render();
