@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use Datatable;
+use Datatable, SSH;
 
 class HomeController extends Controller {
 
@@ -30,9 +30,12 @@ class HomeController extends Controller {
 	 */
 	public function page()
 	{
-		$table = $this->getScheduleTable();
+		$table  = $this->getScheduleTable();
+		$status = $this->getConnectionStatus();
 
-		return view('home')->with($table);
+		$inputs = array_merge($table, $status);
+
+		return view('home')->with($inputs);
 	}
 
 	/**
@@ -40,15 +43,27 @@ class HomeController extends Controller {
 	 *
 	 * @return Chumper\Datatable\Datatable
 	 */
-	public function getScheduleTable()
+	protected function getScheduleTable()
 	{
 		$table = Datatable::table()
-	    ->addColumn('Event', 'Time', 'Enable')
+	    ->addColumn('Event', 'Time', 'Amount', 'Enable')
 	    ->setUrl(url('schedule/table'))
 	    ->setOptions(['info' => false, 'pagingType' => 'simple', 'lengthChange' => false])
 	    ->render();
 
-		return ['schedule_table' => $table];
+		return ['table' => $table];
+	}
+
+	protected function getConnectionStatus()
+	{
+		$command = ['ls'];
+		$output  = '';
+
+		// SSH::run($command, function($line) {
+		// 	$output .= $line.PHP_EOL;
+		// });
+
+		return ['output' => $output];
 	}
 
 }

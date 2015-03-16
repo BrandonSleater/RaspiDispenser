@@ -21,7 +21,7 @@ Route::get('home', 'HomeController@page');
 Route::post('schedule/add', 'ScheduleController@add');
 Route::post('schedule/update', 'ScheduleController@update');
 Route::get('schedule/edit&ID={id}', 'ScheduleController@edit');
-Route::get('schedule/table', 'ScheduleController@getTable');
+Route::get('schedule/table', 'ScheduleController@table');
 
 /* Settings */
 Route::get('settings', 'SettingsController@page');
@@ -29,7 +29,7 @@ Route::get('settings', 'SettingsController@page');
 /* Settings - File */
 Route::post('file/add', 'FileController@add');
 Route::get('file/edit&ID={id}&EN={enable}', 'FileController@edit');
-Route::get('file/table', 'FileController@getTable');
+Route::get('file/table', 'FileController@table');
 
 Route::controllers([
 	'auth'     => 'Auth\AuthController',

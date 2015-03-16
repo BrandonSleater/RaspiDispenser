@@ -17,6 +17,7 @@ class CreateScheduleTable extends Migration {
 			$table->increments('id');
 			$table->string('event');
 			$table->time('time');
+			$table->integer('amount');
 			$table->integer('user');
 			$table->boolean('enable')->default(1);
 			$table->rememberToken();

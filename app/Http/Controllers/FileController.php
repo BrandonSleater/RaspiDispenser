@@ -1,9 +1,13 @@
 <?php namespace App\Http\Controllers;
 
-use Auth, Datatable, DB, File, Input, Redirect, Request, Session, Validator;
+use Auth, Datatable, DB, File, Redirect, Session, Validator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 class FileController extends Controller {
+
+	private $destination;
+	private $path;
 
 	/*
 	|--------------------------------------------------------------------------
@@ -22,37 +26,8 @@ class FileController extends Controller {
 	public function __construct()
 	{
 		$this->middleware('auth');
-	}
 
-	/**
-	 * Process adding a sound file.
-	 *
-	 * @return Redirect
-	 */
-	public function add()
-	{
-  	// Setup
-		$destination = public_path().'/sounds/'.Auth::id().'/';
-	  $message = [];
-
-	  // Input
-	  $file  = ['image' => Input::file('image')];
-	  $rules = ['image' => 'required'];
-
-	  $validator = Validator::make($file, $rules);
-	  
-	  if ($validator->fails())
-	  {
-	    return Redirect::to('settings')->withInput()->withErrors($validator);
-	  } 
-	  else 
-	  {
-	  	$message = $this->upload($destination);
-	  }
-
-    Session::flash($message['type'], $message['content']);
-
-	  return Redirect::to('settings');
+		$this->destination = public_path().'/sounds/'.Auth::id().'/';
 	}
 
 	/**
@@ -85,9 +60,19 @@ class FileController extends Controller {
 	 *
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function getTable()
+	public function table()
 	{
-		$results = DB::select('select id, name, enable from file where user = ?', [Auth::id()]);
+		$sql = '
+			select 
+				id, 
+				name, 
+				enable 
+			from 
+				file 
+			where 
+				user = ?';
+
+		$results = DB::select($sql, [Auth::id()]);
 
 		return Datatable::collection(new Collection($results))
 			->showColumns('name')
@@ -101,23 +86,94 @@ class FileController extends Controller {
 	}
 
 	/**
+	 * Process adding a sound file.
+	 *
+	 * @return Redirect
+	 */
+	public function add(Request $request)
+	{
+	  $v = Validator::make($request->all(), [
+	  	'image' => 'required'
+	  ]);
+	  
+	  if ($v->fails())
+	  {
+	    return Redirect::to('settings')->withInput()->withErrors($v);
+	  } 
+	  else 
+	  {
+	  	$message = $this->upload($request);
+	  }
+
+    Session::flash($message['type'], $message['content']);
+
+	  return Redirect::to('settings');
+	}
+
+	/**
+	 * Upload a sound file into storage.
+	 *
+	 * @param  Request $request
+	 * @return array
+	 */
+	protected function upload(Request $request)
+	{
+    $extension = $request->file('image')->getClientOriginalExtension();
+    $filename  = $request->file('image')->getClientOriginalName();
+
+    $this->path = $this->destination.$filename;
+
+    // Ensure its a sound file
+    if ($request->file('image')->isValid() && $extension === 'mp3')
+    {
+      try 
+      {
+      	$request->file('image')->move($this->destination, $filename);
+
+      	// Record entry
+      	$this->doAdd($filename);
+      }
+      catch (Exception $exception)
+      {
+      	Log::error($exception);
+      }
+
+      $content = 'Upload Successful!';
+      $type = 'success';
+    }
+    else 
+    {
+      $desc = ($extension !== 'mp3') ? 'Incorrect Extension (need mp3)' : 'Invalid File';
+
+      $content = 'Upload Failed - '.$desc;
+    	$type = 'error';
+    }
+
+    return ['content' => $content, 'type' => $type];
+	}
+
+	/**
 	 * Insert the sound file into to the file table.
 	 *
 	 * @param  string $path
 	 * @return void
 	 */
-	public function record($path)
+	private function doAdd($filename)
 	{
-		$name = Input::file('image')->getClientOriginalName();
+		$sql = '
+			update file set 
+				enable = 0
+			where 
+				user = ? and 
+				enable = 1';
 
 		// Disable the old record
-		DB::update('update file set enable = ? where user = ? and enable = 1', [0, Auth::id()]);
+		DB::update($sql, [Auth::id()]);
 
 		// We want relative
-		$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
+		$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->path);
 
-		// Create the record
-		DB::insert('
+		$sql = '
 			insert into file 
 				(name, user, path, created_at) 
 			values 
@@ -125,53 +181,9 @@ class FileController extends Controller {
 			on duplicate key update
 				path = ?,
 				enable = 1, 
-				updated_at = NOW()', [$name, Auth::id(), $path, $path]);
-	}
+				updated_at = NOW()';
 
-	/**
-	 * Upload a sound file into storage.
-	 *
-	 * @param  string $destination
-	 * @return array
-	 */
-	private function upload($destination)
-	{
-    $extension = Input::file('image')->getClientOriginalExtension();
-
-    // Message details
-    $content = $type = '';
-
-    // Ensure its a sound file
-    if (Input::file('image')->isValid() && $extension === 'mp3')
-    {
-      $filename = Input::file('image')->getClientOriginalName();
-
-      // Insert file
-      try 
-      {
-      	$path = $destination.$filename;
-
-      	Input::file('image')->move($destination, $filename);
-
-      	$this->record($path);
-      }
-      catch (Exception $exception)
-      {
-      	Log::error($exception);
-      }
-
-      $type = 'success';
-      $content = 'Upload Successful!';
-    }
-    else 
-    {
-      $desc = ($extension !== 'mp3') ? 'Incorrect Extension (need mp3)' : 'Invalid File';
-
-    	$type = 'error';
-      $content = 'Upload Failed - '.$desc;
-    }
-
-    return ['content' => $content, 'type' => $type];
+		DB::insert($sql, [$filename, Auth::id(), $path, $path]);
 	}
 
 }

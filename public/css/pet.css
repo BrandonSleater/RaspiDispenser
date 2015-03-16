@@ -3,6 +3,8 @@ body {
 }
 
 a {
+	color: #ff9681;
+	font-weight: 500;
 	outline: 0 !important;
 }
 
@@ -11,7 +13,7 @@ a:hover {
 	color: #494748;	
 }
 
-a, .dark {
+.dark {
 	color: #8f8d8e;
 }
 
@@ -75,16 +77,6 @@ fieldset[disabled] .btn-pastel.active {
 	height: 23px;
 }
 
-#dispense-event {
-	margin-left: 5px;
-	margin-right: 5px;
-}
-
-#dispense-time, #edit-time {
-	border-radius: 4px;
-	width: 160px;
-}
-
 .home {
 	margin-top: 40px;
 }
@@ -117,6 +109,8 @@ fieldset[disabled] .btn-pastel.active {
 
 .schedule-time {
 	margin-left: 15px;
+	border-radius: 4px !important;
+	width: 160px !important;
 }
 
 .time-label {

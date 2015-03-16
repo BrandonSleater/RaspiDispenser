@@ -10,7 +10,7 @@
 		| in the server list. Each connection will be manually accessible.
 		|
 		*/
-		'default'     => 'production',
+		'default' => 'production',
 		/*
 		|--------------------------------------------------------------------------
 		| Remote Server Connections
@@ -41,7 +41,7 @@
 		| that is extremely easy to remember, such as "web" or "database".
 		|
 		*/
-		'groups'      => [
+		'groups' => [
 			'web' => [ 'raspi' ]
 		],
 	];

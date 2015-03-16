@@ -10,33 +10,50 @@
 					@endforeach
 				</ul>
 			</div>
+		@elseif (session('time_error'))
+			<div class="alert alert-danger">
+				{{ session('time_error') }}
+			</div>
 		@endif
 
-		<form class="form-inline" role="form" method="POST" action="{{ url('/schedule/add') }}">
+		<form class="form-horizontal" role="form" method="POST" action="{{ url('/schedule/add') }}">
 			<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 			<div class="form-group">
-				<label class="control-label" for="dispense-event">Event</label>
-				<input type="text" class="form-control" id="dispense-event" name="event">
+				<label class="col-md-2 control-label">Event</label>
+				<div class="col-md-4">
+					<input type="text" class="form-control" name="event">
+				</div>
 			</div>
 
-		  <div class="form-group">
-		    <label class="control-label time-label" for="dispense-time">Dispense @</label>
+			<div class="form-group">
+		    <label class="col-md-2 control-label">Dispense @</label>
 		    <div class="input-group bootstrap-timepicker">
-	      	<input type="text" class="form-control" id="dispense-time" name="time">
+	      	<input type="text" class="form-control schedule-time" name="time">
 		      <span class="form-control-feedback"><i class="fa fa-clock-o"></i></span>
 		    </div>
 		  </div>
-			
-			<button type="submit" class="btn btn-pastel">Add Time</button>
+
+		  <div class="form-group">
+		    <label class="col-md-2 control-label">Amount</label>
+				<div class="col-md-2">
+					<input type="text" class="form-control" name="amount" placeholder="seconds">
+				</div>
+		  </div>
+
+			<div class="form-group">
+				<div class="col-md-2 col-md-offset-2">
+					<button type="submit" class="btn btn-pastel">Add</button>
+				</div>
+			</div>
 		</form>
 		<hr>
 
-		{!! $schedule_table !!}	
+		{!! $table !!}	
 
 		{{-- Start our timepicker --}}
     <script type="text/javascript">
-      $('#dispense-time').timepicker({
+      $('.schedule-time').timepicker({
       	defaultTime: false,
         minuteStep: 1,
         showSeconds: false
