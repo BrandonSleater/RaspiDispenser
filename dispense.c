@@ -1,75 +1,83 @@
 /**
  * Author: Brandon Sleater
- * Desc:   This program will rotate a servo clockwise/counterclockwise
- *         through an interrupt
- *
- * Resource: Based off LinuxCircle.com example
+ * Desc:   This program will open and close a feeder gate
  */
 
 #include <wiringPi.h>
 
 #define SERVO_PIN  1
-#define BUTTON_PIN 7
 
-static int servoMode = 1;
-static unsigned int lastInterrupt = 0;
+static int delay     = 8000;
+static int increment = 5;
 
-void rotate(int pos) {
+/* Servo positions */
+static int open_start  = 700;
+static int open_end    = 900;
+static int close_start = 2500;
+static int close_end   = 2150;
 
-  // Start the pulse, delay the length, then kill it
+
+/**
+ * Start a pulse, delay by the position value 
+ * passed, kill the pulse, then delay.
+ */
+void rotate(int pos) 
+{
   digitalWrite(SERVO_PIN, HIGH);
   delayMicroseconds(pos);
   digitalWrite(SERVO_PIN, LOW);
 
   // Ensure full rotation
-  delayMicroseconds(8000);
+  delayMicroseconds(delay);
 }
 
+/**
+ * Opens the gate
+ */
+void open(void) 
+{
+  int pos = 0;
 
-void handler(void) {
-
-  unsigned int currentInterrupt = millis();
-
-  // Software debounce because capacitors suck
-  if (currentInterrupt - lastInterrupt > 1000) {
-
-    int pos = 0;
-
-    if (servoMode) {
-
-      // Forward
-      for (pos = 700; pos < 900; pos += 5) {
-        rotate(pos);
-      }
-    } else {
-
-      // Reverse
-      for (pos = 2500; pos > 2150; pos -= 5) {
-        rotate(pos);
-      }
-    }
-
-    servoMode = !servoMode;
+  for (pos = open_start; pos < open_end; pos += increment) 
+  {
+    rotate(pos);
   }
-
-  lastInterrupt = currentInterrupt;
 }
 
+/**
+ * Closes the gate
+ */
+void close(void) 
+{
+  int pos = 0;
 
-int main () {
+  for (pos = close_start; pos > close_end; pos -= increment) 
+  {
+    rotate(pos);
+  }
+}
 
-  // Init wiringPi
+/**
+ * Open the gate, pause, close the gate.
+ */
+void dispense(void)
+{
+	open()
+	delayMicroseconds(5000);
+	close();
+}
+
+/**
+ * Core build.
+ */
+int main (void) 
+{
+  // Initialize wiringPi and the raspi
   wiringPiSetup();
-
-  // Init interrupt handler
-  wiringPiISR(BUTTON_PIN, INT_EDGE_FALLING, &handler);
-
-  // Init servo
   pinMode(SERVO_PIN, OUTPUT);
 
-  while (1) {
-    // Don't die plz
-  }
+  // Startup
+  dispense();
 
   return 0;
 }
