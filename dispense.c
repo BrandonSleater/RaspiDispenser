@@ -1,11 +1,11 @@
 /**
  * Author: Brandon Sleater
- * Desc:   This program will open and close a feeder gate
+ * Desc:   This program will open and close a feeder gate.
  */
 
 #include <wiringPi.h>
 
-#define SERVO_PIN  1
+#define SERVO_PIN 1
 
 static const int delay     = 8000;
 static const int increment = 5;

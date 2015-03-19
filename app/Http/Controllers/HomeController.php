@@ -33,7 +33,7 @@ class HomeController extends Controller {
 	public function page()
 	{
 		$table  = $this->getScheduleTable();
-		$status = $this->getConnectionStatus();
+		$status = $this->getConnectionStatus(5000);
 
 		$inputs = array_merge($table, $status);
 
@@ -61,13 +61,13 @@ class HomeController extends Controller {
 	 *
 	 * @param array
 	 */
-	protected function getConnectionStatus()
+	protected function getConnectionStatus($amount)
 	{
-		$command = ['ls'];
+		$command = env('RASPI_COMMAND').' '.$amount;
 
 		try
 		{
-			SSH::run($command, function($line) {
+			SSH::run([$command], function($line) {
 				$this->output = $line.PHP_EOL;
 			});
 		}
@@ -76,7 +76,7 @@ class HomeController extends Controller {
 			// Intentionally left blank
 		}
 
-		return ['output' => $this->output];
+		return ['status' => $this->output];
 	}
 
 }
