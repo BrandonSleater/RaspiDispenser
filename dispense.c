@@ -7,14 +7,14 @@
 
 #define SERVO_PIN  1
 
-static int delay     = 8000;
-static int increment = 5;
+static const int delay     = 8000;
+static const int increment = 5;
 
 /* Servo positions */
-static int open_start  = 700;
-static int open_end    = 900;
-static int close_start = 2500;
-static int close_end   = 2150;
+static const int open_start  = 700;
+static const int open_end    = 900;
+static const int close_start = 2500;
+static const int close_end   = 2150;
 
 
 /**
@@ -60,24 +60,29 @@ void close(void)
 /**
  * Open the gate, pause, close the gate.
  */
-void dispense(void)
+void dispense(int amount)
 {
 	open()
-	delayMicroseconds(5000);
+	delayMicroseconds(amount);
 	close();
 }
 
 /**
  * Core build.
  */
-int main (void) 
+int main (int argc, char *argv[]) 
 {
-  // Initialize wiringPi and the raspi
-  wiringPiSetup();
-  pinMode(SERVO_PIN, OUTPUT);
+	if (argc == 1)
+	{
+		int amount = atoi(argv[0]);
 
-  // Startup
-  dispense();
+  	// Initialize wiringPi and the raspi
+	  wiringPiSetup();
+	  pinMode(SERVO_PIN, OUTPUT);
+
+	  // Startup
+	  dispense(amount);
+	}
 
   return 0;
 }
