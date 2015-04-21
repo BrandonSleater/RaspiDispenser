@@ -207,5 +207,5 @@ class FileController extends Controller {
 
 		return Redirect::to('settings');
 	}
-
+	
 }

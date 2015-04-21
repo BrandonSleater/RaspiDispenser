@@ -10,9 +10,9 @@
 					@endforeach
 				</ul>
 			</div>
-		@elseif (session('time_error'))
+		@elseif (session('error'))
 			<div class="alert alert-danger">
-				{{ session('time_error') }}
+				{{ session('error') }}
 			</div>
 		@endif
 

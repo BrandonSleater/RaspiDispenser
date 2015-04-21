@@ -17,7 +17,7 @@
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
   			
   			<button class="btn btn-pastel btn-sm btn-upload" type="submit">Upload File</button>
-  			<input type="file" class="inline-file" name="image"></input>
+  			<input type="file" class="inline-file" name="sound"></input>
 	  	</form>
 
 			@if (!empty($sound_path))

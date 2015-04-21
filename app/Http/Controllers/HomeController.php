@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use Datatable, SSH;
+use Datatable, Redirect, Session, SSH;
 
 class HomeController extends Controller {
 
@@ -33,9 +33,9 @@ class HomeController extends Controller {
 	public function page()
 	{
 		$table  = $this->getScheduleTable();
-		$status = $this->getConnectionStatus(5000);
+		$supply = $this->getCurrentSuply();
 
-		$inputs = array_merge($table, $status);
+		$inputs = array_merge($table, $supply);
 
 		return view('home')->with($inputs);
 	}
@@ -57,26 +57,30 @@ class HomeController extends Controller {
 	}
 
 	/**
-	 * Make contact with the raspberry pi.
+	 * Get the current food amount. We return back the distance 
 	 *
 	 * @param array
 	 */
-	protected function getConnectionStatus($amount)
+	protected function getCurrentSuply()
 	{
-		$command = env('RASPI_COMMAND').' '.$amount;
+		$supply = 0;
 
 		try
 		{
-			SSH::run([$command], function($line) {
+			SSH::run([env('RASPI_COMMAND_SUPPLY')], function($line) {
 				$this->output = $line.PHP_EOL;
 			});
 		}
-		catch (\ErrorException $e)
+		catch (\ErrorException $ignored) { }
+
+		if (!empty($this->output))
 		{
-			// Intentionally left blank
+			// Convert to amount left
+			$supply = ($this->output / env('FEEDER_HEIGHT')) * 100;
+			$supply = $supply === 1 ? 0 : floor(100 - $supply);
 		}
 
-		return ['status' => $this->output];
+		return ['supply' => $supply];
 	}
 
 }

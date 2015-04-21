@@ -64,7 +64,7 @@ class ScheduleController extends Controller {
 			where 
 				user = ?
 			order by
-				time desc';
+				time asc';
 
 		$results = DB::select($sql, [Auth::id()]);
 
@@ -103,7 +103,16 @@ class ScheduleController extends Controller {
 	  } 
 	  else 
 	  {
-	  	$this->doAdd($request->all());
+	  	$inputs = $request->all();
+
+	  	if (!$this->validateCollision($inputs)) 
+	  	{
+	  		Session::flash('error', 'Time Collision');
+	  		return Redirect::to('home');
+	  	}
+
+	  	$this->doAdd($inputs);
+	  	// $this->doSetSchedule($inputs);
 	  }
 
 	  Session::flash('success', 'Schedule Added Successfully');
@@ -131,7 +140,16 @@ class ScheduleController extends Controller {
 	  } 
 	  else 
 	  {
-	  	$this->doUpdate($request->all());
+	  	$inputs = $request->all();
+
+	  	if (!$this->validateCollision($inputs)) 
+	  	{
+	  		Session::flash('error', 'Time Collision');
+	  		return Redirect::to('home');
+	  	}
+	  	
+	  	$this->doUpdate($inputs);
+	  	// $this->doSetSchedule($inputs);
 	  }
 
 	  Session::flash('success', 'Schedule Updated Successfully');
@@ -198,7 +216,7 @@ class ScheduleController extends Controller {
 		}
 		catch (\Illuminate\Database\QueryException $e)
 		{
-			Session::flash('time_error', 'Time Already Exists');
+			Session::flash('error', 'Time Already Exists');
 		  return Redirect::to('home');
 		}
 	}
@@ -214,6 +232,89 @@ class ScheduleController extends Controller {
 		DB::table('schedule')->where('id', $id)->delete();
 
 		return Redirect::to('home');
+	}
+
+	/**
+	 * Handle any collisions between dispense times
+	 * and length of amount.
+	 */
+	protected function validateCollision($inputs, $isUpdate = false)
+	{
+		$time   = date('H:i:s', strtotime($inputs['time']) + $inputs['amount']);
+		$valid  = true;
+		$values = [Auth::id(), $time, $time];
+
+		$sql = '
+			SELECT 
+				COUNT(*) AS "collision"
+			FROM 
+				schedule
+			WHERE 
+				user = ? AND
+				? >= time AND
+				? <= DATE_ADD(time, INTERVAL amount SECOND)';
+
+		if ($isUpdate)
+		{
+			$sql .= ' AND id != ?';
+			$values[] = $inputs['id'];
+		}
+
+		$results = DB::select($sql, $values);
+
+		if ($results[0]->collision)
+		{
+			$valid = false;
+		}
+
+		return $valid;
+	}
+
+	/**
+	 * Build the cron input and set the schedule.
+	 *
+	 * @param  array $inputs
+	 * @return void
+	 */
+	public function doSetSchedule($inputs)
+	{
+		$cron_file = '';
+		$dispense  = env("RASPI_COMMAND_DISPENSE");
+
+		// We just rewrite entire list.. meh
+		$results = DB::table('schedule')
+			->where('user', '=', Auth::id())
+			->where('enable', '=', 1)
+			->orderBy('time', 'asc')
+			->get();
+
+		foreach ($results as $result)
+		{
+			$time = explode(':', $result->time);
+
+			// Remove extra zero
+			$time = array_map(function($val) 
+			{
+				return (int) $val;
+			}, $time);
+
+			// Run everyday at specific time
+			$cron_file .= $time[1].' '.$time[0].' * * * '.$dispense.' '.$result->amount.' \n ';
+		}
+		
+		$command = 'echo "'.$cron_file.'" >> /tmp/cron.txt; crontab /tmp/cron.txt';
+
+		// Update the pi
+		try
+		{
+			SSH::run([$command]);
+		}
+		catch (\ErrorException $e)
+		{
+			// Intentionally left blank
+			Session::flash('error', 'Couldn\'t set feeder schedule!');
+		  return Redirect::to('home');
+		}
 	}
 
 }
