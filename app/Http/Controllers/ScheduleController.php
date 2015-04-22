@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use Auth, Datatable, DB, Redirect, Session, Validator;
+use Auth, Datatable, DB, Redirect, Session, SSH, Validator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
@@ -110,9 +110,11 @@ class ScheduleController extends Controller {
 	  		Session::flash('error', 'Time Collision');
 	  		return Redirect::to('home');
 	  	}
-
-	  	$this->doAdd($inputs);
-	  	// $this->doSetSchedule($inputs);
+	  	else
+	  	{
+	  		$this->doAdd($inputs);
+	  		$this->doSetSchedule($inputs);
+	  	}
 	  }
 
 	  Session::flash('success', 'Schedule Added Successfully');
@@ -149,7 +151,7 @@ class ScheduleController extends Controller {
 	  	}
 	  	
 	  	$this->doUpdate($inputs);
-	  	// $this->doSetSchedule($inputs);
+	  	$this->doSetSchedule($inputs);
 	  }
 
 	  Session::flash('success', 'Schedule Updated Successfully');
@@ -279,18 +281,26 @@ class ScheduleController extends Controller {
 	public function doSetSchedule($inputs)
 	{
 		$cron_file = '';
-		$dispense  = env("RASPI_COMMAND_DISPENSE");
 
-		// We just rewrite entire list.. meh
-		$results = DB::table('schedule')
+		$sound = DB::table('file')
+			->where('user', '=', Auth::id())
+			->where('enable', '=', 1)
+			->get();
+
+		$schedules = DB::table('schedule')
 			->where('user', '=', Auth::id())
 			->where('enable', '=', 1)
 			->orderBy('time', 'asc')
 			->get();
 
-		foreach ($results as $result)
+		$idx  = 0;
+		$size = count($schedules);
+
+		foreach ($schedules as $schedule)
 		{
-			$time = explode(':', $result->time);
+			// Dealing with ms
+			$amount = $schedule->amount.'000';
+			$time 	= explode(':', $schedule->time);
 
 			// Remove extra zero
 			$time = array_map(function($val) 
@@ -298,11 +308,19 @@ class ScheduleController extends Controller {
 				return (int) $val;
 			}, $time);
 
-			// Run everyday at specific time
-			$cron_file .= $time[1].' '.$time[0].' * * * '.$dispense.' '.$result->amount.' \n ';
+			// Run everyday a at specific time
+			$cron_file .= $time[1].' '.$time[0].' * * * '.env('RASPI_COMMAND_DISPENSE').' '.$amount.' '.$sound[0]->name;
+
+			if (++$idx !== $size)
+			{
+				$cron_file .= ' \n ';
+			}
 		}
 		
-		$command = 'echo "'.$cron_file.'" >> /tmp/cron.txt; crontab /tmp/cron.txt';
+		// Remove old file, add new cron times to file and set it
+		$command  = 'rm '.env('RASPI_CRON_TMP_FILE').'; ';
+		$command .= 'echo "'.$cron_file.'" >> '.env('RASPI_CRON_TMP_FILE').'; ';
+		$command .= 'crontab '.env('RASPI_CRON_TMP_FILE');
 
 		// Update the pi
 		try
@@ -311,7 +329,6 @@ class ScheduleController extends Controller {
 		}
 		catch (\ErrorException $e)
 		{
-			// Intentionally left blank
 			Session::flash('error', 'Couldn\'t set feeder schedule!');
 		  return Redirect::to('home');
 		}

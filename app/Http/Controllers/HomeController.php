@@ -58,6 +58,8 @@ class HomeController extends Controller {
 
 	/**
 	 * Get the current food amount. We return back the distance 
+	 * to the nearest piece of food and convert it to the amount left.
+	 * Yes this is not exactly the most accurate method. (╯°□°）╯︵ ┻━┻
 	 *
 	 * @param array
 	 */
@@ -76,8 +78,11 @@ class HomeController extends Controller {
 		if (!empty($this->output))
 		{
 			// Convert to amount left
-			$supply = ($this->output / env('FEEDER_HEIGHT')) * 100;
-			$supply = $supply === 1 ? 0 : floor(100 - $supply);
+			$temp 	= ($this->output / env('RASPI_FEEDER_HEIGHT')) * 100;
+			$supply = floor(100 - $temp);
+
+			// For use on other pages
+			Session::put('supply', $supply);
 		}
 
 		return ['supply' => $supply];

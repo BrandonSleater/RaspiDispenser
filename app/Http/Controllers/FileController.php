@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use Auth, Datatable, DB, File, Redirect, Session, Validator;
+use Auth, Datatable, DB, File, Redirect, Session, SSH, Validator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
@@ -27,7 +27,7 @@ class FileController extends Controller {
 	{
 		$this->middleware('auth');
 
-		$this->destination = public_path().'/sounds/'.Auth::id().'/';
+		$this->destination = public_path().'/sounds/';
 	}
 
 	/**
@@ -97,9 +97,9 @@ class FileController extends Controller {
 	public function add(Request $request)
 	{
 	  $v = Validator::make($request->all(), [
-	  	'image' => 'required'
+	  	'sound' => 'required'
 	  ]);
-	  
+
 	  if ($v->fails())
 	  {
 	    return Redirect::to('settings')->withInput()->withErrors($v);
@@ -122,17 +122,18 @@ class FileController extends Controller {
 	 */
 	protected function upload(Request $request)
 	{
-    $extension = $request->file('image')->getClientOriginalExtension();
-    $filename  = $request->file('image')->getClientOriginalName();
+    $extension = $request->file('sound')->getClientOriginalExtension();
+    $filename  = $request->file('sound')->getClientOriginalName();
 
     $this->path = $this->destination.$filename;
 
-    // Ensure its a sound file
-    if ($request->file('image')->isValid() && $extension === 'mp3')
+    if ($request->file('sound')->isValid())
     {
       try 
       {
-      	$request->file('image')->move($this->destination, $filename);
+      	// Move sound file to web (play through app) and pi (play through speaker)
+      	$request->file('sound')->move($this->destination, $filename);
+      	$this->doSetSound($filename);
 
       	// Record entry
       	$this->doAdd($filename);
@@ -206,6 +207,28 @@ class FileController extends Controller {
 		DB::table('file')->where('id', $id)->delete();
 
 		return Redirect::to('settings');
+	}
+
+	/**
+	 * Upload the sound file.
+	 *
+	 * @param  string $filename
+	 * @return void
+	 */
+	public function doSetSound($filename)
+	{
+		$local  = $this->destination.$filename;
+		$remote = env('RASPI_SOUND_DIR').$filename;
+
+		try
+		{
+			SSH::put($local, $remote);
+		}
+		catch (\ErrorException $e)
+		{
+			Session::flash('error', 'Sound file not uploaded to feeder!');
+		  return Redirect::to('home');
+		}
 	}
 	
 }

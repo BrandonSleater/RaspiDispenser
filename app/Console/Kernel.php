@@ -22,13 +22,7 @@ class Kernel extends ConsoleKernel {
 	 */
 	protected function schedule(Schedule $schedule)
 	{
-		$storage = storage_path().'/logs/cron.log';
-		$email = 'im@brandonsleater.me';
-
-		$schedule->command('inspire')
-				->everyFiveMinutes()
-				->sendOutputTo($storage)
-        ->emailOutputTo($email); 
+		
 	}
 
 }
